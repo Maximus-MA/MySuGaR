@@ -91,6 +91,7 @@ class GaussianSplattingWrapper:
             eval_split_interval (int, optional): Every eval_split_interval images, an image is added to the evaluation set. 
                 Defaults to 8 (following standard practice).
         """
+
         self.source_path = source_path
         self.output_path = output_path
         self.loaded_iteration = iteration_to_load

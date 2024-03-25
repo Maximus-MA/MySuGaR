@@ -26,14 +26,28 @@ def load_gs_cameras(source_path, gs_output_path, image_resolution=1,
     Returns:
         List of GSCameras: List of Gaussian Splatting cameras.
     """
-    image_dir = os.path.join(source_path, 'images')
+
+    if os.path.exists(os.path.join(source_path, 'images')):
+        data_type = 'colmap'
+    else:
+        data_type = 'blender'
+
     
-    with open(gs_output_path + 'cameras.json') as f:
+    with open(os.path.join(gs_output_path, 'cameras.json')) as f:
         unsorted_camera_transforms = json.load(f)
-    camera_transforms = sorted(unsorted_camera_transforms.copy(), key = lambda x : x['img_name'])
+    if data_type == 'colmap':
+        camera_transforms = sorted(unsorted_camera_transforms.copy(), key = lambda x : x['img_name'])
+    else:
+        camera_transforms = sorted(unsorted_camera_transforms.copy(), key = lambda x : x['path'])
+
 
     cam_list = []
-    extension = '.' + os.listdir(image_dir)[0].split('.')[-1]
+    if data_type == 'colmap':
+        image_dir = os.path.join(source_path, 'images')
+        extension = '.' + os.listdir(image_dir)[0].split('.')[-1]
+    else:
+        extension = '.' + camera_transforms[0]['path'].split('.')[-1]
+
     if extension not in ['.jpg', '.png', '.JPG', '.PNG']:
         print(f"Warning: image extension {extension} not supported.")
     else:
@@ -66,7 +80,10 @@ def load_gs_cameras(source_path, gs_output_path, image_resolution=1,
         # GT data
         id = camera_transform['id']
         name = camera_transform['img_name']
-        image_path = os.path.join(image_dir,  name + extension)
+        if data_type == 'colmap':
+            image_path = os.path.join(image_dir,  name + extension)
+        else:
+            image_path = camera_transform['path']
         
         if load_gt_images:
             image = Image.open(image_path)

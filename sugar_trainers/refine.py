@@ -288,6 +288,8 @@ def refined_training(args):
     export_ply_at_the_end = args.export_ply
     
     ply_path = os.path.join(source_path, "sparse/0/points3D.ply")
+    if not os.path.exists(ply_path):
+        ply_path = os.path.join(source_path, 'points3d.ply')
     
     CONSOLE.print("-----Parsed parameters-----")
     CONSOLE.print("Source path:", source_path)
